@@ -19,11 +19,11 @@ pipeline {
                 }
             }
         }
-        stage('CWP Scan'){
+        /*stage('CWP Scan'){
             steps {
                  fortiCWPScanner imageName: 'owasp-benchmark:latest', block: true
             }
-        }
+        }*/
         stage('SAST'){
             steps {
                  sh 'docker pull registry.fortidevsec.forticloud.com/fdevsec_sast:latest'

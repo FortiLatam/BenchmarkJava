@@ -1,0 +1,29 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: owasp-benchmark
+spec:
+  template:
+    metadata:
+      labels:
+        app: owasp-benchmark
+    spec:
+      containers:
+      - name: owasp-benchmark
+        image: 371571523880.dkr.ecr.us-east-1.amazonaws.com/owasp-benchmark:latest
+  selector:
+    matchLabels:
+      app: owasp-benchmark
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: owasp-benchmark
+spec:
+  type: LoadBalancer
+  selector:
+    app: owasp-benchmark
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80

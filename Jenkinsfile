@@ -15,7 +15,7 @@ pipeline {
         stage('Build') { 
             steps { 
                 script{
-                 app = docker.build("owasp-benchmark")
+                 app = docker.build("VMs/owasp-benchmark")
                 }
             }
         }

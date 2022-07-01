@@ -19,7 +19,7 @@ pipeline {
                 }
             }
         }
-        stage('CWP Image Scan'){
+        stage('FortiCWP Image Scan'){
             steps {
                  fortiCWPScanner imageName: 'owasp-benchmark:latest', block: true
             }

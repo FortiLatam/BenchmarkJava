@@ -1,4 +1,5 @@
 # This dockerfile builds a container that pulls down and runs the latest version of Benchmark
+# New test
 FROM ubuntu:latest
 MAINTAINER "Dave Wichers dave.wichers@owasp.org"
 

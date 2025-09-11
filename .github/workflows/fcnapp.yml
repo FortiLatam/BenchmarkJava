@@ -53,8 +53,7 @@ jobs:
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: results.sarif
-          ref: refs/pull/${{ github.event.pull_request.number }}/merge
-          sha: ${{ github.event.pull_request.head.sha }}
+
 
       # (Opcional) Step 7: Upload SARIF como artifact para download manual
       - name: Upload SARIF Artifact

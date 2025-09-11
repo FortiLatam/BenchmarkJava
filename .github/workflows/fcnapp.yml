@@ -13,9 +13,9 @@ jobs:
       # Step 1: Checkout full repo with history
       - name: Checkout repository
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+        #with:
+        #  fetch-depth: 0
+        #  token: ${{ secrets.GITHUB_TOKEN }}
 
       # Step 2: Install and configure Lacework CLI
       - name: Install Lacework CLI
@@ -30,23 +30,24 @@ jobs:
       # Step 3: Run Lacework SCA Scan on source (head) branch
       - name: Run Lacework SCA Scan on Source Branch 
         run: |
-          git checkout ${{ github.event.pull_request.head.sha }}
-          lacework sca scan ./ -f sarif -o /tmp/lacework-scan-source.json 
+          #git checkout ${{ github.event.pull_request.head.sha }}
+          #lacework sca scan ./ -f sarif -o /tmp/lacework-scan-source.json 
+          lacework sca scan ./ -f sarif -o results.sarif --save-results
 
       # Step 4: Run Lacework SCA Scan on target (base) branch
-      - name: Run Lacework SCA Scan on Target Branch 
-        run: |
-          git checkout ${{ github.event.pull_request.base.sha }}
-          lacework sca scan ./ -f sarif -o /tmp/lacework-scan-target.json 
+      #- name: Run Lacework SCA Scan on Target Branch 
+       # run: |
+        #  git checkout ${{ github.event.pull_request.base.sha }}
+         # lacework sca scan ./ -f sarif -o /tmp/lacework-scan-target.json 
 
       # Step 5: Compare results and generate SARIF
-      - name: Compare JSON Files and Generate SARIF 
-        run: |
-          git checkout ${{ github.event.pull_request.head.sha }}
-          lacework sca compare --new /tmp/lacework-scan-source.json \
-                               --old /tmp/lacework-scan-target.json \
-                               --formats sarif \
-                               -o results.sarif 
+      #- name: Compare JSON Files and Generate SARIF 
+      #  run: |
+      #    git checkout ${{ github.event.pull_request.head.sha }}
+      #    lacework sca compare --new /tmp/lacework-scan-source.json \
+      #                         --old /tmp/lacework-scan-target.json \
+      #                         --formats sarif \
+      #                         -o results.sarif 
 
       # Step 6: Upload SARIF to GitHub Security tab
       - name: Upload SARIF File 

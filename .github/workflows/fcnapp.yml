@@ -3,59 +3,62 @@ name: Lacework SCA/SAST Pull Request
 on: 
   pull_request: 
     branches: 
-      - master  # Specify the target branch for the pull request trigger 
+      - master  
 
 jobs: 
   build: 
-    runs-on: ubuntu-latest  # The job runs on the latest Ubuntu environment 
+    runs-on: ubuntu-latest  
 
     steps: 
-      # Step 1: Check out the source branch (head of the pull request) 
-      - name: Checkout source branch 
-        uses: actions/checkout@v3  # Use the checkout action to pull the source branch code 
-        with: 
-          ref: ${{ github.event.pull_request.head.ref }}  # Reference the source branch of the pull request 
-          token: ${{ secrets.GITHUB_TOKEN }}  # Use the GitHub token for authentication 
+      # Step 1: Checkout full repo with history
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 2: Run the Lacework SCA scan on the source branch and save the output 
+      # Step 2: Install and configure Lacework CLI
+      - name: Install Lacework CLI
+        run: |
+          curl https://raw.githubusercontent.com/lacework/go-sdk/main/cli/install.sh | bash 
+          lacework configure -a ${{ secrets.LW_ACCOUNT }}.lacework.net \
+                             -k ${{ secrets.LW_API_KEY }} \
+                             -s ${{ secrets.LW_API_SECRET }} \
+                             --noninteractive 
+          lacework component install sca 
+
+      # Step 3: Run Lacework SCA Scan on source (head) branch
       - name: Run Lacework SCA Scan on Source Branch 
         run: |
-          # Download and install the Lacework CLI using a shell script 
-          curl https://raw.githubusercontent.com/lacework/go-sdk/main/cli/install.sh | bash 
-          # Configure the Lacework CLI with account, API key, and secret from GitHub secrets 
-          lacework configure -a ${{ secrets.LW_ACCOUNT }}.lacework.net -k ${{ secrets.LW_API_KEY }} -s ${{ secrets.LW_API_SECRET }} --noninteractive 
-          # Install the Software Composition Analysis (SCA) component 
-          lacework component install sca 
+          git checkout ${{ github.event.pull_request.head.sha }}
           lacework sca scan ./ -f sarif -o /tmp/lacework-scan-source.json 
-          # Scan the source branch code, output in SARIF format, and save to /tmp/lacework-scan-source.json 
 
-      # Step 3: Check out the target branch of the pull request 
-      - name: Checkout target branch 
-        uses: actions/checkout@v3  # Use the checkout action to pull the target branch code 
-        with: 
-          ref: ${{ github.event.pull_request.base.ref }}  # Reference the target branch of the pull request 
-          token: ${{ secrets.GITHUB_TOKEN }}  # Use the GitHub token for authentication 
-
-      # Step 4: Run the Lacework SCA scan on the target branch and save the output 
+      # Step 4: Run Lacework SCA Scan on target (base) branch
       - name: Run Lacework SCA Scan on Target Branch 
-        run: lacework sca scan ./ -f sarif -o /tmp/lacework-scan-target.json 
-        # Scan the target branch code, output in SARIF format, and save to /tmp/lacework-scan-target.json 
+        run: |
+          git checkout ${{ github.event.pull_request.base.sha }}
+          lacework sca scan ./ -f sarif -o /tmp/lacework-scan-target.json 
 
-      # Step 5: Compare results from the two scans and generate SARIF output 
+      # Step 5: Compare results and generate SARIF
       - name: Compare JSON Files and Generate SARIF 
-        #run: lacework sca compare --new /tmp/lacework-scan-source.json --old /tmp/lacework-scan-target.json --formats sarif -o /tmp/lacework-comparison.sarif 
-        run: lacework sca compare --new /tmp/lacework-scan-source.json --old /tmp/lacework-scan-target.json --formats sarif -o results.sarif 
-        # Compare the JSON outputs from the source and target branches 
-        # Generate the comparison result in SARIF format and save to /tmp/lacework-comparison.sarif 
+        run: |
+          git checkout ${{ github.event.pull_request.head.sha }}
+          lacework sca compare --new /tmp/lacework-scan-source.json \
+                               --old /tmp/lacework-scan-target.json \
+                               --formats sarif \
+                               -o results.sarif 
 
-      # Step 7: Upload the SARIF file for analysis or further use 
+      # Step 6: Upload SARIF to GitHub Security tab
       - name: Upload SARIF File 
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: results.sarif
-          sha: ${{ github.event.pull_request.base.sha }}
           ref: refs/pull/${{ github.event.pull_request.number }}/merge
-        #uses: actions/upload-artifact@v4  # Use the upload artifact action to save the SARIF file 
-        #with: 
-          #name: lacework-comparison-report  # Name of the uploaded artifact 
-          #path: /tmp/lacework-comparison.sarif  # Path to the SARIF file
+          sha: ${{ github.event.pull_request.head.sha }}
+
+      # (Opcional) Step 7: Upload SARIF como artifact para download manual
+      - name: Upload SARIF Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lacework-comparison-report
+          path: results.sarif

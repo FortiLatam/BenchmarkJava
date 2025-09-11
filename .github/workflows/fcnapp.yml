@@ -53,7 +53,7 @@ jobs:
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: results.sarif
-          commit_sha: ${{ github.event.pull_request.base.sha }}
+          sha: ${{ github.event.pull_request.base.sha }}
           ref: refs/pull/${{ github.event.pull_request.number }}/merge
         #uses: actions/upload-artifact@v4  # Use the upload artifact action to save the SARIF file 
         #with: 

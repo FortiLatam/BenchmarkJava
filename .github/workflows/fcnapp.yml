@@ -34,11 +34,11 @@ jobs:
       - name: Check for failure criteria
         run: |
           bash <(curl -sSL https://raw.githubusercontent.com/FortiLatam/FCNAPP-tools/refs/heads/main/Code-Security/azdo-fail-codesec.sh)
-          env:
-            SCA_HIGH: fail
-            SCA_CRIT: fail
-            SAST_HIGH: fail
-            SAST_CRIT: fail
+        env:
+          SCA_HIGH: fail
+          SCA_CRIT: fail
+          SAST_HIGH: fail
+          SAST_CRIT: fail
           workingDirectory: '$(Build.SourcesDirectory)/'
 
 

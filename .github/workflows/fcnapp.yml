@@ -1,5 +1,6 @@
 #Edit for only check without compare
-name: Lacework SCA/SAST Pull Request 
+name: Lacework SCA/SAST Pull Request
+
 
 on: 
   pull_request: 
@@ -18,7 +19,7 @@ jobs:
         #  fetch-depth: 0
         #  token: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 2: Install and configure Lacework CLI
+      # Step 2: Install, configure and run FortiCNAPP
       - name: Install Lacework CLI
         run: |
           curl https://raw.githubusercontent.com/lacework/go-sdk/main/cli/install.sh | bash 
@@ -27,13 +28,20 @@ jobs:
                              -s ${{ secrets.LW_API_SECRET }} \
                              --noninteractive 
           lacework component install sca 
-
-      # Step 3: Run Lacework SCA Scan on source (head) branch
-      - name: Run Lacework SCA Scan on Source Branch 
-        run: |
           #git checkout ${{ github.event.pull_request.head.sha }}
           #lacework sca scan ./ -f sarif -o /tmp/lacework-scan-source.json 
           lacework sca scan ./ -f sarif -o results.sarif --save-results
+
+      - name: Check for failure criteria
+        run: |
+          bash <(curl -sSL https://raw.githubusercontent.com/FortiLatam/FCNAPP-tools/refs/heads/main/Code-Security/azdo-fail-codesec.sh)
+          env:
+            SCA_HIGH: fail
+            SCA_CRIT: fail
+            SAST_HIGH: fail
+            SAST_CRIT: fail
+          workingDirectory: '$(Build.SourcesDirectory)/'
+
 
       # Step 4: Run Lacework SCA Scan on target (base) branch
       #- name: Run Lacework SCA Scan on Target Branch 
@@ -61,8 +69,8 @@ jobs:
 
 
       # (Opcional) Step 7: Upload SARIF como artifact para download manual
-      - name: Upload SARIF Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: lacework-comparison-report
-          path: results.sarif
+      #- name: Upload SARIF Artifact
+      #  uses: actions/upload-artifact@v4
+      #  with:
+      #    name: lacework-comparison-report
+      #    path: results.sarif

@@ -29,7 +29,7 @@ jobs:
           lacework component install sca 
           #git checkout ${{ github.event.pull_request.head.sha }}
           #lacework sca scan ./ -f sarif -o /tmp/lacework-scan-source.json 
-          lacework sca scan ./ -f sarif -o results.sarif --save-results
+          lacework sca scan ./ -f sarif -o lacework-scan.sarif --save-results
 
       - name: Check for failure criteria
         run: |
@@ -61,7 +61,7 @@ jobs:
       - name: Upload SARIF File 
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: results.sarif
+          sarif_file: lacework-scan.sarif
           category: lacework-sca
           ref: refs/pull/${{ github.event.pull_request.number }}/head
           sha: ${{ github.event.pull_request.head.sha }}

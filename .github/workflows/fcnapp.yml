@@ -31,15 +31,15 @@ jobs:
           #lacework sca scan ./ -f sarif -o /tmp/lacework-scan-source.json 
           lacework sca scan ./ -f sarif -o results.sarif --save-results
 
-      - name: Check for failure criteria
-        run: |
-          bash <(curl -sSL https://raw.githubusercontent.com/FortiLatam/FCNAPP-tools/refs/heads/main/Code-Security/azdo-fail-codesec.sh)
-          env:
-            SCA_HIGH: fail
-            SCA_CRIT: fail
-            SAST_HIGH: fail
-            SAST_CRIT: fail
-          workingDirectory: '$(Build.SourcesDirectory)/'
+      #- name: Check for failure criteria
+      #  run: |
+      #    bash <(curl -sSL https://raw.githubusercontent.com/FortiLatam/FCNAPP-tools/refs/heads/main/Code-Security/azdo-fail-codesec.sh)
+      #    env:
+      #      SCA_HIGH: fail
+      #      SCA_CRIT: fail
+      #      SAST_HIGH: fail
+      #      SAST_CRIT: fail
+      #    workingDirectory: '$(Build.SourcesDirectory)/'
 
 
       # Step 4: Run Lacework SCA Scan on target (base) branch

@@ -31,7 +31,8 @@ jobs:
           lacework component install sca 
           #git checkout ${{ github.event.pull_request.head.sha }}
           #lacework sca scan ./ -f sarif -o /tmp/lacework-scan-source.json 
-          lacework sca scan ./ -f sarif -o results.sarif --save-results
+          #lacework sca scan ./ -f sarif -o results.sarif --save-results
+          lacework sca scan ./ -f sarif -o lacework-scan.sarif --save-results
 
       - name: Check for failure criteria
         env:

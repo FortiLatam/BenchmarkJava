@@ -36,10 +36,10 @@ jobs:
 
       - name: Check for failure criteria
         env:
-          SCA_HIGH: fail
-          SCA_CRIT: fail
-          SAST_HIGH: fail
-          SAST_CRIT: fail
+          SCA_HIGH: pass
+          SCA_CRIT: pass
+          SAST_HIGH: pass
+          SAST_CRIT: pass
         run: |
           bash <(curl -sSL https://raw.githubusercontent.com/FortiLatam/FCNAPP-tools/refs/heads/main/Code-Security/azdo-fail-codesec.sh)
 

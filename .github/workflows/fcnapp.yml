@@ -2,17 +2,7 @@ name: Lacework SCA/SAST Pull Request
 
 
 on: 
-  workflow_dispatch:
-    inputs:
-      scan_ref:
-        description: 'Branch/ref to be scanned'
-        required: false
-        default: 'refs/heads/master'
-      upload_ref:
-        description: 'Ref to Sarif'
-        required: false
-        default: ''
-  
+ 
   pull_request: 
     branches: 
       - master  
